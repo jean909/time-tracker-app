@@ -1,0 +1,11 @@
+{
+  "name": "pontaj-simplu",
+  "version": "1.0.0",
+  "description": "Aplicatie pontaj pentru tableta (admin + kiosk)",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static app - no build needed'"
+  },
+  "type": "module"
+}
