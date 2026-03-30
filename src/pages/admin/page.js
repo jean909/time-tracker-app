@@ -1,3 +1,5 @@
+import { t } from "../utils/i18n.js";
+
 export function renderAdminPage(root, model, handlers) {
   if (model.editingEmployee) {
     return renderEmployeeDetail(root, model, handlers);
@@ -8,12 +10,12 @@ export function renderAdminPage(root, model, handlers) {
       (row) => `
       <tr>
         <td>${row.name}</td>
-        <td>${row.status}</td>
-        <td>${row.worked} (${row.sessionsCount} sesiuni)</td>
+        <td>${t(row.status)}</td>
+        <td>${row.worked} (${row.sessionsCount} ${t('sessions')})</td>
         <td>${row.lastEvent}</td>
         <td>
-          <button class="btn btn-primary" data-edit="${row.id}">Editeaza</button>
-          <button class="btn btn-danger" data-remove="${row.id}">Sterge</button>
+          <button class="btn btn-primary" data-edit="${row.id}">${t('edit')}</button>
+          <button class="btn btn-danger" data-remove="${row.id}">${t('delete')}</button>
         </td>
       </tr>`
     )
@@ -21,46 +23,46 @@ export function renderAdminPage(root, model, handlers) {
 
   const events = model.events
     .slice(0, 20)
-    .map((event) => `<li>${event.employeeName} - ${event.type} - ${event.at}</li>`)
+    .map((event) => `<li>${event.employeeName} - ${t(event.type)} - ${event.at}</li>`)
     .join("");
 
   root.innerHTML = `
     <div class="container grid">
       <div class="toolbar">
-        <h1>Admin</h1>
+        <h1>${t('admin')}</h1>
         <div class="row">
-          <button class="btn" id="go-kiosk">Kiosk</button>
-          <button class="btn" id="go-home">Logout</button>
+          <button class="btn" id="go-kiosk">${t('kiosk')}</button>
+          <button class="btn" id="go-home">${t('logout')}</button>
         </div>
       </div>
 
       <div class="card">
-        <h2>Adauga angajat</h2>
+        <h2>${t('addEmployee')}</h2>
         <div class="row">
-          <input class="input" id="employee-name" placeholder="Nume angajat" />
-          <button class="btn btn-success" id="add-employee">Adauga</button>
+          <input class="input" id="employee-name" placeholder="${t('employeeName')}" />
+          <button class="btn btn-success" id="add-employee">${t('add')}</button>
         </div>
       </div>
 
       <div class="card">
-        <h2>Situatie curenta</h2>
+        <h2>${t('currentSituation')}</h2>
         <table>
           <thead>
             <tr>
-              <th>Nume</th>
-              <th>Status</th>
-              <th>Total ore</th>
-              <th>Ultimul eveniment</th>
-              <th>Actiuni</th>
+              <th>${t('name')}</th>
+              <th>${t('status')}</th>
+              <th>${t('totalHours')}</th>
+              <th>${t('lastEvent')}</th>
+              <th>${t('actions')}</th>
             </tr>
           </thead>
-          <tbody>${rows || "<tr><td colspan='5'>Nu exista angajati.</td></tr>"}</tbody>
+          <tbody>${rows || `<tr><td colspan='5'>${t('noEmployees')}</td></tr>`}</tbody>
         </table>
       </div>
 
       <div class="card">
-        <h2>Ultimele evenimente</h2>
-        <ul>${events || "<li>Nu exista evenimente.</li>"}</ul>
+        <h2>${t('recentEvents')}</h2>
+        <ul>${events || `<li>${t('noEvents')}</li>`}</ul>
       </div>
     </div>
   `;
@@ -102,8 +104,8 @@ function renderEmployeeDetail(root, model, handlers) {
                  data-field="end" />
         </td>
         <td>
-          <button class="btn btn-success" data-save="${session.id}">Salveaza</button>
-          <button class="btn btn-danger" data-delete-session="${session.id}">Sterge</button>
+          <button class="btn btn-success" data-save="${session.id}">${t('save')}</button>
+          <button class="btn btn-danger" data-delete-session="${session.id}">${t('delete')}</button>
         </td>
       </tr>
     `;
@@ -112,39 +114,39 @@ function renderEmployeeDetail(root, model, handlers) {
   root.innerHTML = `
     <div class="container grid">
       <div class="toolbar">
-        <h1>Editeaza pontaj: ${employee.name}</h1>
-        <button class="btn" id="back-admin">Inapoi la Admin</button>
+        <h1>${t('editTimeTracking')}: ${employee.name}</h1>
+        <button class="btn" id="back-admin">${t('backToAdmin')}</button>
       </div>
 
       <div class="card">
-        <h2>Adauga sesiune manuala</h2>
+        <h2>${t('addManualSession')}</h2>
         <div class="grid grid-2">
           <div>
-            <label>Intrare:</label>
+            <label>${t('entry')}:</label>
             <input type="datetime-local" id="manual-start" class="input" />
           </div>
           <div>
-            <label>Iesire (optional):</label>
+            <label>${t('exit')}:</label>
             <input type="datetime-local" id="manual-end" class="input" />
           </div>
           <div style="grid-column: 1 / -1;">
-            <button class="btn btn-success" id="add-manual">Adauga sesiune</button>
+            <button class="btn btn-success" id="add-manual">${t('addSession')}</button>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h2>Sesiuni existente</h2>
+        <h2>${t('existingSessions')}</h2>
         <table>
           <thead>
             <tr>
-              <th>Intrare</th>
-              <th>Iesire</th>
-              <th>Actiuni</th>
+              <th>${t('entry')}</th>
+              <th>${t('exit')}</th>
+              <th>${t('actions')}</th>
             </tr>
           </thead>
           <tbody>
-            ${sessionRows || "<tr><td colspan='3'>Nu exista sesiuni.</td></tr>"}
+            ${sessionRows || `<tr><td colspan='3'>${t('noSessions')}</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -170,7 +172,7 @@ function renderEmployeeDetail(root, model, handlers) {
 
   root.querySelectorAll("[data-delete-session]").forEach((button) => {
     button.addEventListener("click", () => {
-      if (confirm("Sigur stergi aceasta sesiune?")) {
+      if (confirm(t('confirmDelete'))) {
         handlers.onDeleteSession(button.getAttribute("data-delete-session"));
       }
     });

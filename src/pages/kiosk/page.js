@@ -1,13 +1,16 @@
+import { t } from "../utils/i18n.js";
+
 export function renderKioskPage(root, model, handlers) {
   const employeeButtons = model.employees
     .map((employee) => {
       const status = model.getStatus(employee.id);
       const className = status === "IN" ? "status-on" : "status-off";
+      const statusText = status === "IN" ? t('atWork') : t('away');
       return `
       <button class="btn employee-btn ${className}" data-employee-id="${employee.id}">
         ${employee.name}
         <br />
-        <small>${status === "IN" ? "La munca" : "Plecat"}</small>
+        <small>${statusText}</small>
       </button>`;
     })
     .join("");
@@ -15,16 +18,16 @@ export function renderKioskPage(root, model, handlers) {
   root.innerHTML = `
     <div class="container">
       <div class="toolbar">
-        <h1>Mod Kiosk</h1>
+        <h1>${t('kioskMode')}</h1>
         <div class="row">
-          <button class="btn" id="back-home">Inapoi</button>
-          <button class="btn btn-primary" id="go-admin">Admin</button>
+          <button class="btn" id="back-home">${t('back')}</button>
+          <button class="btn btn-primary" id="go-admin">${t('admin')}</button>
         </div>
       </div>
-      <p class="muted">Apasa pe nume pentru intrare/iesire/revenire.</p>
-      <div class="message" id="kiosk-message">${model.message || "Selecteaza un nume."}</div>
+      <p class="muted">${t('tapForEntry')}</p>
+      <div class="message" id="kiosk-message">${model.message || t('selectName')}</div>
       <div class="card" style="margin-top:12px;">
-        <div class="kiosk-grid">${employeeButtons || "<p>Nu exista angajati.</p>"}</div>
+        <div class="kiosk-grid">${employeeButtons || `<p>${t('noEmployees')}</p>`}</div>
       </div>
     </div>
   `;

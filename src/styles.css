@@ -162,3 +162,45 @@ label {
 input[type="datetime-local"] {
   width: 100%;
 }
+
+/* PWA Install Prompt */
+.install-prompt {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.install-prompt.hidden {
+  transform: translateY(120%);
+}
+
+.install-content h3 {
+  margin: 0 0 8px 0;
+  color: var(--accent);
+}
+
+.install-content p {
+  margin: 0 0 12px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.install-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 480px) {
+  .install-actions {
+    flex-direction: column;
+  }
+}

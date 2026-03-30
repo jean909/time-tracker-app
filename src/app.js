@@ -16,6 +16,7 @@ import {
   toggleEmployee,
 } from "./state/store.js";
 import { formatDateTime } from "./utils/time.js";
+import { initLanguage, setLanguage, t, getCurrentLanguage } from "./utils/i18n.js";
 
 const root = document.getElementById("app");
 
@@ -28,7 +29,15 @@ const viewState = {
 
 let state = loadState();
 
+// Initialize language
+initLanguage();
+
 function rerender() {
+  // Update language selector if it exists
+  const langSelect = document.querySelector('#language-select');
+  if (langSelect) {
+    langSelect.value = getCurrentLanguage();
+  }
   if (viewState.route === "login") {
     renderLoginPage(root, {
       onGoKiosk: () => {
@@ -44,8 +53,12 @@ function rerender() {
         }
         const errorBox = root.querySelector("#error-box");
         if (errorBox) {
-          errorBox.textContent = "Credentiale invalide.";
+          errorBox.textContent = t('invalidCredentials');
         }
+      },
+      onLanguageChange: (lang) => {
+        setLanguage(lang);
+        rerender();
       },
     });
     return;
@@ -72,7 +85,7 @@ function rerender() {
           const result = toggleEmployee(state, employeeId);
           saveState(state);
           const name = getEmployeeName(state, employeeId);
-          const action = result.type === "IN" ? "a intrat la munca" : "a iesit de la munca";
+          const action = result.type === "IN" ? t('enteredWork') : t('leftWork');
           viewState.kioskMessage = `${name} ${action} (${formatDateTime(result.at)}).`;
           rerender();
         },
@@ -117,7 +130,8 @@ function rerender() {
         rerender();
       },
       onRemoveEmployee: (employeeId) => {
-        if (confirm(`Sigur stergi angajatul ${getEmployeeName(state, employeeId)}? Se vor pierde toate datele de pontaj.`)) {
+        const employeeName = getEmployeeName(state, employeeId);
+        if (confirm(t('confirmDeleteEmployee', { name: employeeName }))) {
           removeEmployee(state, employeeId);
           saveState(state);
           rerender();
@@ -139,7 +153,7 @@ function rerender() {
           saveState(state);
           rerender();
         } else {
-          alert("Datele introduse sunt invalide. Verifica formatul si ordinea datelor.");
+          alert(t('invalidData'));
         }
       },
       onEditSession: (sessionId, startTime, endTime) => {
@@ -147,7 +161,7 @@ function rerender() {
           saveState(state);
           rerender();
         } else {
-          alert("Datele introduse sunt invalide. Verifica formatul si ordinea datelor.");
+          alert(t('invalidData'));
         }
       },
       onDeleteSession: (sessionId) => {
