@@ -1,4 +1,4 @@
-import { t, getAvailableLanguages } from "../../utils/i18n.js";
+import { t, getCurrentLanguage } from "../../utils/i18n.js";
 
 export function renderLoginPage(root, handlers) {
   root.innerHTML = `
