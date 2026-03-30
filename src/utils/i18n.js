@@ -133,7 +133,7 @@ const translations = {
   }
 };
 
-let currentLanguage = 'en';
+let currentLanguage = 'de'; // German as default
 
 export function setLanguage(lang) {
   if (translations[lang]) {
@@ -147,7 +147,7 @@ export function getCurrentLanguage() {
 }
 
 export function t(key, replacements = {}) {
-  const translation = translations[currentLanguage]?.[key] || translations.en[key] || key;
+  const translation = translations[currentLanguage]?.[key] || translations.de[key] || key;
   
   // Simple string replacement for placeholders like {name}
   return Object.keys(replacements).reduce((str, placeholder) => {
@@ -157,8 +157,8 @@ export function t(key, replacements = {}) {
 
 export function initLanguage() {
   const saved = localStorage.getItem('preferred_language');
-  const browser = navigator.language.startsWith('de') ? 'de' : 'en';
-  setLanguage(saved || browser);
+  // Default to German, only use English if explicitly saved
+  setLanguage(saved || 'de');
 }
 
 export function getAvailableLanguages() {

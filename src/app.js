@@ -33,11 +33,14 @@ let state = loadState();
 initLanguage();
 
 function rerender() {
-  // Update language selector if it exists
-  const langSelect = document.querySelector('#language-select');
-  if (langSelect) {
-    langSelect.value = getCurrentLanguage();
-  }
+  // Update active language button
+  document.querySelectorAll('.language-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.getAttribute('data-lang') === getCurrentLanguage()) {
+      btn.classList.add('active');
+    }
+  });
+}
   if (viewState.route === "login") {
     renderLoginPage(root, {
       onGoKiosk: () => {
@@ -61,7 +64,6 @@ function rerender() {
         rerender();
       },
     });
-    return;
   }
 
   if (viewState.route === "kiosk") {

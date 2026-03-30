@@ -1,44 +1,43 @@
 import { t, getAvailableLanguages } from "../../utils/i18n.js";
 
 export function renderLoginPage(root, handlers) {
-  const languages = getAvailableLanguages();
-  const languageOptions = languages.map(lang => 
-    `<option value="${lang.code}">${lang.name}</option>`
-  ).join('');
-
   root.innerHTML = `
-    <div class="container grid" style="max-width: 480px; margin-top: 60px;">
-      <div class="card">
-        <div class="toolbar">
-          <h1>${t('appTitle')}</h1>
-          <select id="language-select" class="input" style="width: auto;">
-            ${languageOptions}
-          </select>
-        </div>
+    <div class="container grid login-container">
+      <div class="card welcome-card">
+        <h1>${t('appTitle')}</h1>
         <p class="muted">${t('appDescription')}</p>
+        <div class="language-toggle">
+          <button class="btn language-btn ${getCurrentLanguage() === 'de' ? 'active' : ''}" data-lang="de">🇩🇪 Deutsch</button>
+          <button class="btn language-btn ${getCurrentLanguage() === 'en' ? 'active' : ''}" data-lang="en">🇺🇸 English</button>
+        </div>
       </div>
 
-      <div class="card">
+      <div class="card kiosk-card">
         <h2>${t('kioskEntry')}</h2>
         <p class="muted">${t('kioskDescription')}</p>
-        <button class="btn btn-success" id="go-kiosk">${t('openKiosk')}</button>
+        <button class="btn btn-success btn-large" id="go-kiosk">${t('openKiosk')}</button>
       </div>
 
-      <div class="card">
+      <div class="card admin-card">
         <h2>${t('adminEntry')}</h2>
-        <div class="grid">
-          <input class="input" id="admin-user" placeholder="${t('username')}" value="admin" />
-          <input class="input" id="admin-pass" placeholder="${t('password')}" type="password" value="admin123" />
-          <button class="btn btn-primary" id="go-admin">${t('loginAdmin')}</button>
-          <p class="muted" id="error-box"></p>
+        <div class="admin-form">
+          <input class="input input-large" id="admin-user" placeholder="${t('username')}" value="admin" />
+          <input class="input input-large" id="admin-pass" placeholder="${t('password')}" type="password" value="admin123" />
+          <button class="btn btn-primary btn-large" id="go-admin">${t('loginAdmin')}</button>
+          <p class="error-message" id="error-box"></p>
         </div>
       </div>
     </div>
   `;
 
-  root.querySelector("#language-select").addEventListener("change", (e) => {
-    handlers.onLanguageChange(e.target.value);
+  // Language toggle handlers
+  root.querySelectorAll('.language-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const lang = e.target.getAttribute('data-lang');
+      handlers.onLanguageChange(lang);
+    });
   });
+
   root.querySelector("#go-kiosk").addEventListener("click", handlers.onGoKiosk);
   root.querySelector("#go-admin").addEventListener("click", () => {
     const username = root.querySelector("#admin-user").value;

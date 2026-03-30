@@ -163,6 +163,238 @@ input[type="datetime-local"] {
   width: 100%;
 }
 
+/* Tablet Optimizations */
+.login-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.welcome-card {
+  text-align: center;
+  padding: 30px;
+}
+
+.welcome-card h1 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+.language-toggle {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.language-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.language-btn.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  transform: scale(1.05);
+}
+
+.language-btn:not(.active) {
+  opacity: 0.7;
+}
+
+.kiosk-card, .admin-card {
+  padding: 30px;
+}
+
+.kiosk-card h2, .admin-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  min-height: 60px;
+  width: 100%;
+}
+
+.input-large {
+  padding: 16px;
+  font-size: 18px;
+  min-height: 56px;
+}
+
+.admin-form {
+  display: grid;
+  gap: 16px;
+}
+
+.error-message {
+  color: var(--danger);
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Kiosk Mode Styles */
+.kiosk-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.kiosk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: var(--panel-soft);
+  border-radius: 16px;
+  border: 1px solid #334155;
+}
+
+.kiosk-title h1 {
+  font-size: 2.5rem;
+  margin: 0 0 8px 0;
+  color: var(--accent);
+}
+
+.kiosk-subtitle {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.kiosk-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.kiosk-controls .btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  min-width: 100px;
+}
+
+.kiosk-message {
+  background: var(--accent);
+  color: var(--bg);
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.kiosk-message.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.kiosk-employees {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 30px;
+  border: 1px solid #334155;
+}
+
+.kiosk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.employee-btn {
+  min-height: 140px;
+  padding: 24px;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.employee-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.employee-btn:active {
+  transform: scale(0.98);
+}
+
+.employee-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  justify-content: center;
+}
+
+.employee-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.employee-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-icon {
+  font-size: 20px;
+}
+
+.status-text {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.status-on {
+  border: 2px solid #16a34a;
+  background: linear-gradient(135deg, #064e3b 0%, #0f2f1d 50%, #1a4a2a 100%);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+}
+
+.status-on::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.3), transparent);
+  animation: shine 2s infinite;
+}
+
+.status-off {
+  border: 2px solid #475569;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.no-employees {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px;
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
 /* PWA Install Prompt */
 .install-prompt {
   position: fixed;
@@ -199,8 +431,37 @@ input[type="datetime-local"] {
   justify-content: flex-end;
 }
 
+/* Tablet Portrait */
+@media (max-width: 1024px) and (orientation: portrait) {
+  .login-container {
+    padding: 16px;
+  }
+  
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .kiosk-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+/* Mobile */
 @media (max-width: 480px) {
+  .language-toggle {
+    flex-direction: column;
+  }
+  
   .install-actions {
     flex-direction: column;
+  }
+  
+  .employee-btn {
+    min-height: 100px;
+    font-size: 18px;
+  }
+  
+  .kiosk-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }

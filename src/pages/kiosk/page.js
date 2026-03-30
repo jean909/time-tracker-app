@@ -6,28 +6,41 @@ export function renderKioskPage(root, model, handlers) {
       const status = model.getStatus(employee.id);
       const className = status === "IN" ? "status-on" : "status-off";
       const statusText = status === "IN" ? t('atWork') : t('away');
+      const statusIcon = status === "IN" ? "✅" : "⏸️";
       return `
       <button class="btn employee-btn ${className}" data-employee-id="${employee.id}">
-        ${employee.name}
-        <br />
-        <small>${statusText}</small>
+        <div class="employee-info">
+          <div class="employee-name">${employee.name}</div>
+          <div class="employee-status">
+            <span class="status-icon">${statusIcon}</span>
+            <span class="status-text">${statusText}</span>
+          </div>
+        </div>
       </button>`;
     })
     .join("");
 
   root.innerHTML = `
-    <div class="container">
-      <div class="toolbar">
-        <h1>${t('kioskMode')}</h1>
-        <div class="row">
-          <button class="btn" id="back-home">${t('back')}</button>
+    <div class="container kiosk-container">
+      <div class="kiosk-header">
+        <div class="kiosk-title">
+          <h1>${t('kioskMode')}</h1>
+          <p class="kiosk-subtitle">${t('tapForEntry')}</p>
+        </div>
+        <div class="kiosk-controls">
+          <button class="btn btn-secondary" id="back-home">${t('back')}</button>
           <button class="btn btn-primary" id="go-admin">${t('admin')}</button>
         </div>
       </div>
-      <p class="muted">${t('tapForEntry')}</p>
-      <div class="message" id="kiosk-message">${model.message || t('selectName')}</div>
-      <div class="card" style="margin-top:12px;">
-        <div class="kiosk-grid">${employeeButtons || `<p>${t('noEmployees')}</p>`}</div>
+      
+      <div class="kiosk-message ${model.message ? 'visible' : ''}" id="kiosk-message">
+        ${model.message || ''}
+      </div>
+      
+      <div class="kiosk-employees">
+        <div class="kiosk-grid">
+          ${employeeButtons || `<div class="no-employees"><p>${t('noEmployees')}</p></div>`}
+        </div>
       </div>
     </div>
   `;
