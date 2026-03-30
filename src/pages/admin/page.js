@@ -1,4 +1,4 @@
-import { t } from "../utils/i18n.js";
+import { t } from "../../utils/i18n.js";
 
 export function renderAdminPage(root, model, handlers) {
   if (model.editingEmployee) {
