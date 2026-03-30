@@ -62,7 +62,7 @@ function rerender() {
       btn.classList.add('active');
     }
   });
-}
+
   if (viewState.route === "login") {
     renderLoginPage(root, {
       onGoKiosk: () => {
@@ -86,6 +86,7 @@ function rerender() {
         rerender();
       },
     });
+    return;
   }
 
   if (viewState.route === "kiosk") {
@@ -115,6 +116,7 @@ function rerender() {
         },
       }
     );
+    return;
   }
 
   if (viewState.route === "admin" && !viewState.isAdminAuthenticated) {

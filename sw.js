@@ -1,7 +1,8 @@
-const CACHE_NAME = 'time-tracker-v1.2';
+const CACHE_NAME = 'time-tracker-v1.3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
+  '/config.js',
   '/manifest.json',
   '/src/app.js',
   '/src/styles.css',
