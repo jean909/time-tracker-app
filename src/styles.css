@@ -395,6 +395,55 @@ input[type="datetime-local"] {
   100% { left: 100%; }
 }
 
+/* Status Indicator */
+.status-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid #334155;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 12px;
+  z-index: 1001;
+  opacity: 0.9;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.online {
+  background: var(--accent);
+}
+
+.status-dot.local {
+  background: #f59e0b;
+}
+
+.status-dot.offline {
+  background: #6b7280;
+}
+
+.status-dot.error {
+  background: var(--danger);
+}
+
+.status-text {
+  color: var(--text);
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+
 /* PWA Install Prompt */
 .install-prompt {
   position: fixed;

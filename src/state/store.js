@@ -1,4 +1,5 @@
 import { formatDateTime, formatMinutes, minutesBetween, nowIso } from "../utils/time.js";
+import database from "../utils/database.js";
 
 const STORAGE_KEY = "pontaj_simple_v1";
 
@@ -24,7 +25,38 @@ function safeParse(value) {
   }
 }
 
-export function loadState() {
+// Enhanced state management with database sync
+let isLoadingFromDatabase = false;
+
+export async function loadState() {
+  // Try to load from database first
+  try {
+    if (!isLoadingFromDatabase) {
+      isLoadingFromDatabase = true;
+      const employees = await database.getEmployees();
+      if (employees && employees.length > 0) {
+        // Convert database format to app format
+        const dbState = {
+          admin: defaultState.admin,
+          employees: employees.map(emp => ({
+            id: `emp_${emp.id}`,
+            name: emp.name
+          })),
+          sessions: [], // TODO: Load from database if needed
+          events: [], // TODO: Load from database if needed
+        };
+        saveState(dbState);
+        isLoadingFromDatabase = false;
+        return dbState;
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to load from database, using localStorage:', error);
+  }
+  
+  isLoadingFromDatabase = false;
+  
+  // Fallback to localStorage
   const raw = localStorage.getItem(STORAGE_KEY);
   const parsed = safeParse(raw);
   if (!parsed) {
@@ -73,14 +105,37 @@ export function toggleEmployee(state, employeeId) {
   return { type: "IN", at: timestamp };
 }
 
-export function addEmployee(state, name) {
+export async function addEmployee(state, name) {
   const clean = (name || "").trim();
   if (!clean) return false;
-  state.employees.push({ id: `emp_${crypto.randomUUID()}`, name: clean });
-  return true;
+  
+  try {
+    // Try to add to database first
+    const dbEmployee = await database.addEmployee(clean);
+    const employee = { 
+      id: `emp_${dbEmployee.id || crypto.randomUUID()}`, 
+      name: clean 
+    };
+    state.employees.push(employee);
+    return true;
+  } catch (error) {
+    console.warn('Database add failed, adding locally:', error);
+    // Fallback to local-only
+    state.employees.push({ id: `emp_${crypto.randomUUID()}`, name: clean });
+    return true;
+  }
 }
 
-export function removeEmployee(state, employeeId) {
+export async function removeEmployee(state, employeeId) {
+  try {
+    // Extract numeric ID if format is emp_123
+    const numericId = employeeId.startsWith('emp_') ? employeeId.substring(4) : employeeId;
+    await database.removeEmployee(numericId);
+  } catch (error) {
+    console.warn('Database remove failed, removing locally only:', error);
+  }
+  
+  // Always update local state
   state.employees = state.employees.filter((e) => e.id !== employeeId);
   state.sessions = state.sessions.filter((s) => s.employeeId !== employeeId);
   state.events = state.events.filter((e) => e.employeeId !== employeeId);

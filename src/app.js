@@ -17,6 +17,7 @@ import {
 } from "./state/store.js";
 import { formatDateTime } from "./utils/time.js";
 import { initLanguage, setLanguage, t, getCurrentLanguage } from "./utils/i18n.js";
+import { addStatusIndicator } from "./components/status-indicator.js";
 
 const root = document.getElementById("app");
 
@@ -27,12 +28,33 @@ const viewState = {
   editingEmployee: null,
 };
 
-let state = loadState();
+let state = null;
+let isInitialized = false;
+
+// Initialize app state
+async function initializeApp() {
+  if (isInitialized) return;
+  state = await loadState();
+  isInitialized = true;
+  rerender();
+}
+
+// Initialize on app load
+initializeApp();
 
 // Initialize language
 initLanguage();
 
+// Add status indicator
+addStatusIndicator();
+
 function rerender() {
+  // Don't render until state is loaded
+  if (!state) {
+    document.getElementById('app').innerHTML = '<div class="container"><h1>Loading...</h1></div>';
+    return;
+  }
+
   // Update active language button
   document.querySelectorAll('.language-btn').forEach(btn => {
     btn.classList.remove('active');
@@ -93,7 +115,6 @@ function rerender() {
         },
       }
     );
-    return;
   }
 
   if (viewState.route === "admin" && !viewState.isAdminAuthenticated) {
@@ -126,15 +147,15 @@ function rerender() {
         viewState.editingEmployee = null;
         rerender();
       },
-      onAddEmployee: (name) => {
-        if (!addEmployee(state, name)) return;
+      onAddEmployee: async (name) => {
+        if (!(await addEmployee(state, name))) return;
         saveState(state);
         rerender();
       },
-      onRemoveEmployee: (employeeId) => {
+      onRemoveEmployee: async (employeeId) => {
         const employeeName = getEmployeeName(state, employeeId);
         if (confirm(t('confirmDeleteEmployee', { name: employeeName }))) {
-          removeEmployee(state, employeeId);
+          await removeEmployee(state, employeeId);
           saveState(state);
           rerender();
         }
