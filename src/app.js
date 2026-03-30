@@ -3,8 +3,12 @@ import { renderKioskPage } from "./pages/kiosk/page.js";
 import { renderLoginPage } from "./pages/login/page.js";
 import {
   addEmployee,
+  addManualSession,
   buildAdminRows,
+  deleteSession,
+  editSession,
   getEmployeeName,
+  getEmployeeSessions,
   getEmployeeStatus,
   loadState,
   removeEmployee,
@@ -19,6 +23,7 @@ const viewState = {
   route: "login",
   isAdminAuthenticated: false,
   kioskMessage: "",
+  editingEmployee: null,
 };
 
 let state = loadState();
@@ -91,15 +96,19 @@ function rerender() {
         employeeName: getEmployeeName(state, event.employeeId),
         at: formatDateTime(event.at),
       })),
+      editingEmployee: viewState.editingEmployee,
+      employeeSessions: viewState.editingEmployee ? getEmployeeSessions(state, viewState.editingEmployee.id) : null,
     },
     {
       onLogout: () => {
         viewState.isAdminAuthenticated = false;
         viewState.route = "login";
+        viewState.editingEmployee = null;
         rerender();
       },
       onGoKiosk: () => {
         viewState.route = "kiosk";
+        viewState.editingEmployee = null;
         rerender();
       },
       onAddEmployee: (name) => {
@@ -108,9 +117,44 @@ function rerender() {
         rerender();
       },
       onRemoveEmployee: (employeeId) => {
-        removeEmployee(state, employeeId);
-        saveState(state);
+        if (confirm(`Sigur stergi angajatul ${getEmployeeName(state, employeeId)}? Se vor pierde toate datele de pontaj.`)) {
+          removeEmployee(state, employeeId);
+          saveState(state);
+          rerender();
+        }
+      },
+      onEditEmployee: (employeeId) => {
+        const employee = state.employees.find(e => e.id === employeeId);
+        if (employee) {
+          viewState.editingEmployee = employee;
+          rerender();
+        }
+      },
+      onBackToAdmin: () => {
+        viewState.editingEmployee = null;
         rerender();
+      },
+      onAddManualSession: (employeeId, startTime, endTime) => {
+        if (addManualSession(state, employeeId, startTime, endTime)) {
+          saveState(state);
+          rerender();
+        } else {
+          alert("Datele introduse sunt invalide. Verifica formatul si ordinea datelor.");
+        }
+      },
+      onEditSession: (sessionId, startTime, endTime) => {
+        if (editSession(state, sessionId, startTime, endTime)) {
+          saveState(state);
+          rerender();
+        } else {
+          alert("Datele introduse sunt invalide. Verifica formatul si ordinea datelor.");
+        }
+      },
+      onDeleteSession: (sessionId) => {
+        if (deleteSession(state, sessionId)) {
+          saveState(state);
+          rerender();
+        }
       },
     }
   );

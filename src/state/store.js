@@ -91,6 +91,80 @@ export function getEmployeeName(state, employeeId) {
   return emp ? emp.name : "Necunoscut";
 }
 
+export function addManualSession(state, employeeId, startTime, endTime) {
+  const start = new Date(startTime).toISOString();
+  const end = endTime ? new Date(endTime).toISOString() : null;
+  
+  if (!start || start === 'Invalid Date') return false;
+  if (end && end === 'Invalid Date') return false;
+  if (end && new Date(end) <= new Date(start)) return false;
+
+  const session = {
+    id: `ss_${crypto.randomUUID()}`,
+    employeeId,
+    start,
+    end,
+  };
+  
+  state.sessions.push(session);
+  
+  state.events.unshift({
+    id: `ev_${crypto.randomUUID()}`,
+    employeeId,
+    type: "MANUAL_ADD",
+    at: nowIso(),
+  });
+  
+  return true;
+}
+
+export function deleteSession(state, sessionId) {
+  const sessionIndex = state.sessions.findIndex(s => s.id === sessionId);
+  if (sessionIndex === -1) return false;
+  
+  const session = state.sessions[sessionIndex];
+  state.sessions.splice(sessionIndex, 1);
+  
+  state.events.unshift({
+    id: `ev_${crypto.randomUUID()}`,
+    employeeId: session.employeeId,
+    type: "MANUAL_DELETE",
+    at: nowIso(),
+  });
+  
+  return true;
+}
+
+export function editSession(state, sessionId, startTime, endTime) {
+  const session = state.sessions.find(s => s.id === sessionId);
+  if (!session) return false;
+  
+  const start = new Date(startTime).toISOString();
+  const end = endTime ? new Date(endTime).toISOString() : null;
+  
+  if (!start || start === 'Invalid Date') return false;
+  if (end && end === 'Invalid Date') return false;
+  if (end && new Date(end) <= new Date(start)) return false;
+  
+  session.start = start;
+  session.end = end;
+  
+  state.events.unshift({
+    id: `ev_${crypto.randomUUID()}`,
+    employeeId: session.employeeId,
+    type: "MANUAL_EDIT",
+    at: nowIso(),
+  });
+  
+  return true;
+}
+
+export function getEmployeeSessions(state, employeeId) {
+  return state.sessions
+    .filter(s => s.employeeId === employeeId)
+    .sort((a, b) => new Date(b.start) - new Date(a.start));
+}
+
 export function buildAdminRows(state) {
   const now = new Date().toISOString();
   return state.employees.map((employee) => {
@@ -108,6 +182,7 @@ export function buildAdminRows(state) {
       status,
       worked: formatMinutes(totalMinutes),
       lastEvent: lastEvent ? `${lastEvent.type} • ${formatDateTime(lastEvent.at)}` : "-",
+      sessionsCount: employeeSessions.length,
     };
   });
 }
