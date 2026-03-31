@@ -15,6 +15,7 @@ export function renderAdminPage(root, model, handlers) {
         <td>${row.lastEvent}</td>
         <td>
           <button class="btn btn-primary" data-edit="${row.id}">${t('edit')}</button>
+          <button class="btn" data-export="${row.id}">${t('export')}</button>
           <button class="btn btn-danger" data-remove="${row.id}">${t('delete')}</button>
         </td>
       </tr>`
@@ -75,6 +76,9 @@ export function renderAdminPage(root, model, handlers) {
   });
   root.querySelectorAll("[data-edit]").forEach((button) => {
     button.addEventListener("click", () => handlers.onEditEmployee(button.getAttribute("data-edit")));
+  });
+  root.querySelectorAll("[data-export]").forEach((button) => {
+    button.addEventListener("click", () => handlers.onExportEmployee(button.getAttribute("data-export")));
   });
   root.querySelectorAll("[data-remove]").forEach((button) => {
     button.addEventListener("click", () => handlers.onRemoveEmployee(button.getAttribute("data-remove")));

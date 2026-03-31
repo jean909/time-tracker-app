@@ -25,45 +25,34 @@ function safeParse(value) {
   }
 }
 
-// Enhanced state management with database sync
-let isLoadingFromDatabase = false;
-
 export async function loadState() {
-  // Try to load from database first
-  try {
-    if (!isLoadingFromDatabase) {
-      isLoadingFromDatabase = true;
-      const employees = await database.getEmployees();
-      if (employees && employees.length > 0) {
-        // Convert database format to app format
-        const dbState = {
-          admin: defaultState.admin,
-          employees: employees.map(emp => ({
-            id: `emp_${emp.id}`,
-            name: emp.name
-          })),
-          sessions: [], // TODO: Load from database if needed
-          events: [], // TODO: Load from database if needed
-        };
-        saveState(dbState);
-        isLoadingFromDatabase = false;
-        return dbState;
-      }
-    }
-  } catch (error) {
-    console.warn('Failed to load from database, using localStorage:', error);
-  }
-  
-  isLoadingFromDatabase = false;
-  
-  // Fallback to localStorage
+  // Always prefer local persisted state to preserve punch history on refresh.
   const raw = localStorage.getItem(STORAGE_KEY);
   const parsed = safeParse(raw);
-  if (!parsed) {
-    saveState(defaultState);
-    return structuredClone(defaultState);
+  if (parsed) return parsed;
+
+  // First run: try to bootstrap employees from database.
+  try {
+    const employees = await database.getEmployees();
+    if (employees && employees.length > 0) {
+      const dbState = {
+        admin: defaultState.admin,
+        employees: employees.map((emp) => ({
+          id: `emp_${emp.id}`,
+          name: emp.name,
+        })),
+        sessions: [],
+        events: [],
+      };
+      saveState(dbState);
+      return dbState;
+    }
+  } catch (error) {
+    console.warn("Failed to load from database, using defaults:", error);
   }
-  return parsed;
+
+  saveState(defaultState);
+  return structuredClone(defaultState);
 }
 
 export function saveState(state) {
