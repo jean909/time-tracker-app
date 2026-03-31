@@ -18,7 +18,7 @@ import {
 import { formatDateTime } from "./utils/time.js";
 import { initLanguage, setLanguage, t, getCurrentLanguage } from "./utils/i18n.js";
 import { addStatusIndicator } from "./components/status-indicator.js";
-import { exportEmployeeToExcelLikeCsv } from "./utils/export.js";
+import { exportAllEmployeesToExcelLikeCsv, exportEmployeeToExcelLikeCsv } from "./utils/export.js";
 
 const root = document.getElementById("app");
 
@@ -175,6 +175,11 @@ function rerender() {
         if (!employee) return;
         const sessions = getEmployeeSessions(state, employeeId);
         exportEmployeeToExcelLikeCsv(employee, sessions);
+      },
+      onExportAllEmployees: () => {
+        exportAllEmployeesToExcelLikeCsv(state.employees, (employeeId) =>
+          getEmployeeSessions(state, employeeId)
+        );
       },
       onBackToAdmin: () => {
         viewState.editingEmployee = null;

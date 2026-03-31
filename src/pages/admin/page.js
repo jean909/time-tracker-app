@@ -32,6 +32,7 @@ export function renderAdminPage(root, model, handlers) {
       <div class="toolbar">
         <h1>${t('admin')}</h1>
         <div class="row">
+          <button class="btn" id="export-all">${t('exportAll')}</button>
           <button class="btn" id="go-kiosk">${t('kiosk')}</button>
           <button class="btn" id="go-home">${t('logout')}</button>
         </div>
@@ -70,6 +71,7 @@ export function renderAdminPage(root, model, handlers) {
 
   root.querySelector("#go-home").addEventListener("click", handlers.onLogout);
   root.querySelector("#go-kiosk").addEventListener("click", handlers.onGoKiosk);
+  root.querySelector("#export-all").addEventListener("click", handlers.onExportAllEmployees);
   root.querySelector("#add-employee").addEventListener("click", () => {
     const name = root.querySelector("#employee-name").value;
     handlers.onAddEmployee(name);

@@ -17,6 +17,16 @@ const defaultState = {
   events: [],
 };
 
+function normalizeState(input) {
+  const base = input && typeof input === "object" ? input : {};
+  return {
+    admin: base.admin || defaultState.admin,
+    employees: Array.isArray(base.employees) ? base.employees : [],
+    sessions: Array.isArray(base.sessions) ? base.sessions : [],
+    events: Array.isArray(base.events) ? base.events : [],
+  };
+}
+
 function safeParse(value) {
   try {
     return JSON.parse(value);
@@ -29,7 +39,7 @@ export async function loadState() {
   // Always prefer local persisted state to preserve punch history on refresh.
   const raw = localStorage.getItem(STORAGE_KEY);
   const parsed = safeParse(raw);
-  if (parsed) return parsed;
+  if (parsed) return normalizeState(parsed);
 
   // First run: try to bootstrap employees from database.
   try {
@@ -45,14 +55,14 @@ export async function loadState() {
         events: [],
       };
       saveState(dbState);
-      return dbState;
+      return normalizeState(dbState);
     }
   } catch (error) {
     console.warn("Failed to load from database, using defaults:", error);
   }
 
   saveState(defaultState);
-  return structuredClone(defaultState);
+  return normalizeState(structuredClone(defaultState));
 }
 
 export function saveState(state) {
