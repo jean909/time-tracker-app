@@ -55,6 +55,9 @@
       const installBtn = document.getElementById('install-btn');
       const dismissBtn = document.getElementById('install-dismiss');
 
+      const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+      const isInStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
@@ -83,6 +86,14 @@
         if (Date.now() - dismissedTime < 7 * 24 * 60 * 60 * 1000) { // 7 days
           installPrompt.classList.add('hidden');
         }
+      }
+
+      // iOS/Safari fallback (no beforeinstallprompt support)
+      if (isIOS && !isInStandalone && !localStorage.getItem('install-dismissed')) {
+        installPrompt.classList.remove('hidden');
+        installBtn.style.display = 'none';
+        const text = installPrompt.querySelector('p');
+        text.textContent = 'On iPad/iPhone: Share -> Add to Home Screen to install.';
       }
     </script>
   </body>
