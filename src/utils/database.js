@@ -25,9 +25,22 @@ class Database {
     try {
       const response = await fetch(url, config);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let details = "";
+        try {
+          details = await response.text();
+        } catch {
+          details = "";
+        }
+        throw new Error(`HTTP error! status: ${response.status}${details ? ` body: ${details}` : ""}`);
       }
-      return await response.json();
+      // Some Supabase writes return empty body if Prefer is not set.
+      const text = await response.text();
+      if (!text) return [];
+      try {
+        return JSON.parse(text);
+      } catch {
+        return [];
+      }
     } catch (error) {
       console.error('Database error:', error);
       throw error;
@@ -50,6 +63,17 @@ class Database {
     return await this.request(`employees?id=eq.${id}`, {
       method: 'DELETE',
     });
+  }
+
+  async findEmployeeByName(name) {
+    const safe = encodeURIComponent(name);
+    const result = await this.db.request(`employees?select=id,name&name=eq.${safe}&limit=1`);
+    return result[0] || null;
+  }
+
+  async createEmployee(name) {
+    const result = await this.db.addEmployee(name);
+    return result[0] || null;
   }
 
   // Time sessions
@@ -285,8 +309,23 @@ export class HybridStorage {
     return null;
   }
 
-  async savePunchIn(employeeId, at) {
-    const dbEmployeeId = this.toDbEmployeeId(employeeId);
+  async resolveDbEmployeeId(employeeId, employeeName) {
+    const numeric = this.toDbEmployeeId(employeeId);
+    if (numeric) return numeric;
+    if (!employeeName) return null;
+    try {
+      let emp = await this.findEmployeeByName(employeeName);
+      if (!emp) {
+        emp = await this.createEmployee(employeeName);
+      }
+      return emp?.id || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async savePunchIn(employeeId, at, employeeName = "") {
+    const dbEmployeeId = await this.resolveDbEmployeeId(employeeId, employeeName);
     if (!dbEmployeeId) return;
 
     if (this.shouldUseDatabase()) {
@@ -301,8 +340,8 @@ export class HybridStorage {
     this.addPendingChange({ type: "punch_in", employeeId: dbEmployeeId, at });
   }
 
-  async savePunchOut(employeeId, at) {
-    const dbEmployeeId = this.toDbEmployeeId(employeeId);
+  async savePunchOut(employeeId, at, employeeName = "") {
+    const dbEmployeeId = await this.resolveDbEmployeeId(employeeId, employeeName);
     if (!dbEmployeeId) return;
 
     if (this.shouldUseDatabase()) {
