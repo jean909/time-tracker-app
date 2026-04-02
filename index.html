@@ -72,7 +72,16 @@
             console.log('User choice:', choiceResult.outcome);
             deferredPrompt = null;
           });
+          return;
         }
+
+        // Fallbacks when the install event is unavailable.
+        if (isIOS && !isInStandalone) {
+          alert('On iPad/iPhone: Share -> Add to Home Screen to install.');
+          return;
+        }
+
+        alert('Install prompt is not available right now. Try Chrome/Edge on Android or use browser menu: Install app.');
       });
 
       dismissBtn.addEventListener('click', () => {
@@ -91,7 +100,8 @@
       // iOS/Safari fallback (no beforeinstallprompt support)
       if (isIOS && !isInStandalone && !localStorage.getItem('install-dismissed')) {
         installPrompt.classList.remove('hidden');
-        installBtn.style.display = 'none';
+        installBtn.style.display = 'inline-block';
+        installBtn.textContent = 'How to Install';
         const text = installPrompt.querySelector('p');
         text.textContent = 'On iPad/iPhone: Share -> Add to Home Screen to install.';
       }
