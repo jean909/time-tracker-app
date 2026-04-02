@@ -58,15 +58,30 @@ class Database {
   }
 
   async addSession(employeeId, startTime, endTime = null, breakMinutes = 0) {
-    return await this.request('sessions', {
-      method: 'POST',
-      body: JSON.stringify({
-        employee_id: employeeId,
-        start_time: startTime,
-        end_time: endTime,
-        break_minutes: breakMinutes,
-      }),
-    });
+    try {
+      return await this.request('sessions', {
+        method: 'POST',
+        body: JSON.stringify({
+          employee_id: employeeId,
+          start_time: startTime,
+          end_time: endTime,
+          break_minutes: breakMinutes,
+        }),
+      });
+    } catch (error) {
+      // Backward compatibility: some databases may not have break_minutes yet.
+      if (String(error.message).includes("status: 400")) {
+        return await this.request('sessions', {
+          method: 'POST',
+          body: JSON.stringify({
+            employee_id: employeeId,
+            start_time: startTime,
+            end_time: endTime,
+          }),
+        });
+      }
+      throw error;
+    }
   }
 
   async updateSession(id, endTime) {
