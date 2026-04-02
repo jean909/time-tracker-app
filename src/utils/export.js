@@ -17,7 +17,8 @@ export function exportEmployeeToExcelLikeCsv(employee, sessions) {
   let totalMinutes = 0;
   for (const session of sessions) {
     const end = session.end || nowIso;
-    const workedMinutes = minutesBetween(session.start, end);
+    const breakMinutes = Number(session.breakMinutes ?? session.break_minutes ?? 0) || 0;
+    const workedMinutes = Math.max(0, minutesBetween(session.start, end) - breakMinutes);
     totalMinutes += workedMinutes;
     rows.push([
       new Date(session.start).toLocaleString(),
@@ -58,7 +59,8 @@ export function exportAllEmployeesToExcelLikeCsv(employees, getSessionsForEmploy
     let employeeTotal = 0;
     for (const session of sessions) {
       const end = session.end || nowIso;
-      const workedMinutes = minutesBetween(session.start, end);
+      const breakMinutes = Number(session.breakMinutes ?? session.break_minutes ?? 0) || 0;
+      const workedMinutes = Math.max(0, minutesBetween(session.start, end) - breakMinutes);
       employeeTotal += workedMinutes;
       rows.push([
         employee.name,

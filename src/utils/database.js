@@ -57,13 +57,14 @@ class Database {
     return await this.request('sessions?select=*&order=start_time.desc');
   }
 
-  async addSession(employeeId, startTime, endTime = null) {
+  async addSession(employeeId, startTime, endTime = null, breakMinutes = 0) {
     return await this.request('sessions', {
       method: 'POST',
       body: JSON.stringify({
         employee_id: employeeId,
         start_time: startTime,
         end_time: endTime,
+        break_minutes: breakMinutes,
       }),
     });
   }

@@ -221,6 +221,11 @@ export function getEmployeeSessions(state, employeeId) {
     .sort((a, b) => new Date(b.start) - new Date(a.start));
 }
 
+function getSessionBreakMinutes(session) {
+  const value = Number(session.breakMinutes ?? session.break_minutes ?? 0);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
 export function buildAdminRows(state) {
   const now = new Date().toISOString();
   return state.employees.map((employee) => {
@@ -228,7 +233,9 @@ export function buildAdminRows(state) {
     const employeeSessions = state.sessions.filter((s) => s.employeeId === employee.id);
     const totalMinutes = employeeSessions.reduce((sum, session) => {
       const end = session.end || now;
-      return sum + minutesBetween(session.start, end);
+      const rawMinutes = minutesBetween(session.start, end);
+      const workedMinutes = Math.max(0, rawMinutes - getSessionBreakMinutes(session));
+      return sum + workedMinutes;
     }, 0);
     const lastEvent = state.events.find((ev) => ev.employeeId === employee.id);
 

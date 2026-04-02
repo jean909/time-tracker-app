@@ -19,9 +19,14 @@ CREATE TABLE IF NOT EXISTS sessions (
     employee_id INTEGER REFERENCES employees(id) ON DELETE CASCADE,
     start_time TIMESTAMP WITH TIME ZONE NOT NULL,
     end_time TIMESTAMP WITH TIME ZONE,
+    break_minutes INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Backward-compatible migration for existing databases
+ALTER TABLE sessions
+ADD COLUMN IF NOT EXISTS break_minutes INTEGER NOT NULL DEFAULT 0;
 
 -- 3. Events log (for audit trail)
 CREATE TABLE IF NOT EXISTS events (
