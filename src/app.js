@@ -107,8 +107,8 @@ function rerender() {
           viewState.route = "login";
           rerender();
         },
-        onTapEmployee: (employeeId) => {
-          const result = toggleEmployee(state, employeeId);
+        onTapEmployee: async (employeeId) => {
+          const result = await toggleEmployee(state, employeeId);
           saveState(state);
           const name = getEmployeeName(state, employeeId);
           const action = result.type === "IN" ? t('enteredWork') : t('leftWork');

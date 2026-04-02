@@ -75,6 +75,13 @@ class Database {
     });
   }
 
+  async getLatestOpenSession(employeeId) {
+    const result = await this.request(
+      `sessions?select=*&employee_id=eq.${employeeId}&end_time=is.null&order=start_time.desc&limit=1`
+    );
+    return result[0] || null;
+  }
+
   async deleteSession(id) {
     return await this.request(`sessions?id=eq.${id}`, {
       method: 'DELETE',
@@ -174,6 +181,18 @@ export class HybridStorage {
       case 'add_session':
         await this.db.addSession(change.employeeId, change.startTime, change.endTime);
         break;
+      case 'punch_in':
+        await this.db.addSession(change.employeeId, change.at, null);
+        await this.db.addEvent(change.employeeId, 'IN', change.at);
+        break;
+      case 'punch_out': {
+        const open = await this.db.getLatestOpenSession(change.employeeId);
+        if (open) {
+          await this.db.updateSession(open.id, change.at);
+        }
+        await this.db.addEvent(change.employeeId, 'OUT', change.at);
+        break;
+      }
       // Add more change types as needed
     }
   }
@@ -237,6 +256,52 @@ export class HybridStorage {
       localData.events = localData.events.filter(e => e.employeeId !== id);
       this.saveLocalData(localData);
     }
+  }
+
+  toDbEmployeeId(employeeId) {
+    if (typeof employeeId !== "string") return null;
+    if (employeeId.startsWith("emp_")) {
+      const raw = employeeId.slice(4);
+      if (/^\d+$/.test(raw)) return Number(raw);
+      return null;
+    }
+    if (/^\d+$/.test(employeeId)) return Number(employeeId);
+    return null;
+  }
+
+  async savePunchIn(employeeId, at) {
+    const dbEmployeeId = this.toDbEmployeeId(employeeId);
+    if (!dbEmployeeId) return;
+
+    if (this.shouldUseDatabase()) {
+      try {
+        await this.db.addSession(dbEmployeeId, at, null);
+        await this.db.addEvent(dbEmployeeId, "IN", at);
+        return;
+      } catch (error) {
+        console.warn("Database punch in failed, queueing:", error);
+      }
+    }
+    this.addPendingChange({ type: "punch_in", employeeId: dbEmployeeId, at });
+  }
+
+  async savePunchOut(employeeId, at) {
+    const dbEmployeeId = this.toDbEmployeeId(employeeId);
+    if (!dbEmployeeId) return;
+
+    if (this.shouldUseDatabase()) {
+      try {
+        const open = await this.db.getLatestOpenSession(dbEmployeeId);
+        if (open) {
+          await this.db.updateSession(open.id, at);
+        }
+        await this.db.addEvent(dbEmployeeId, "OUT", at);
+        return;
+      } catch (error) {
+        console.warn("Database punch out failed, queueing:", error);
+      }
+    }
+    this.addPendingChange({ type: "punch_out", employeeId: dbEmployeeId, at });
   }
 }
 

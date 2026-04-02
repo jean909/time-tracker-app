@@ -74,7 +74,7 @@ export function getEmployeeStatus(state, employeeId) {
   return openSession ? "IN" : "OUT";
 }
 
-export function toggleEmployee(state, employeeId) {
+export async function toggleEmployee(state, employeeId) {
   const timestamp = nowIso();
   const openSession = state.sessions.find((s) => s.employeeId === employeeId && !s.end);
 
@@ -86,6 +86,7 @@ export function toggleEmployee(state, employeeId) {
       type: "OUT",
       at: timestamp,
     });
+    await database.savePunchOut(employeeId, timestamp);
     return { type: "OUT", at: timestamp };
   }
 
@@ -101,6 +102,7 @@ export function toggleEmployee(state, employeeId) {
     type: "IN",
     at: timestamp,
   });
+  await database.savePunchIn(employeeId, timestamp);
   return { type: "IN", at: timestamp };
 }
 
