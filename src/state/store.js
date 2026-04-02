@@ -19,11 +19,34 @@ const defaultState = {
 
 function normalizeState(input) {
   const base = input && typeof input === "object" ? input : {};
+  const normalizeEmployeeId = (id) => {
+    if (typeof id === "number") return `emp_${id}`;
+    if (typeof id !== "string") return `emp_${crypto.randomUUID()}`;
+    if (id.startsWith("emp_")) return id;
+    if (/^\d+$/.test(id)) return `emp_${id}`;
+    return id;
+  };
+
+  const employees = (Array.isArray(base.employees) ? base.employees : []).map((e) => ({
+    ...e,
+    id: normalizeEmployeeId(e?.id),
+  }));
+
+  const sessions = (Array.isArray(base.sessions) ? base.sessions : []).map((s) => ({
+    ...s,
+    employeeId: normalizeEmployeeId(s?.employeeId),
+  }));
+
+  const events = (Array.isArray(base.events) ? base.events : []).map((ev) => ({
+    ...ev,
+    employeeId: normalizeEmployeeId(ev?.employeeId),
+  }));
+
   return {
     admin: base.admin || defaultState.admin,
-    employees: Array.isArray(base.employees) ? base.employees : [],
-    sessions: Array.isArray(base.sessions) ? base.sessions : [],
-    events: Array.isArray(base.events) ? base.events : [],
+    employees,
+    sessions,
+    events,
   };
 }
 
