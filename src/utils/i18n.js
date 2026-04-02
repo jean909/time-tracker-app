@@ -57,6 +57,7 @@ const translations = {
     confirmDelete: "Are you sure you want to delete this session?",
     confirmDeleteEmployee: "Are you sure you want to delete employee {name}? All time tracking data will be lost.",
     invalidData: "The entered data is invalid. Check the format and order of dates.",
+    unknownEmployee: "Unknown employee",
 
     // Status
     IN: "IN",
@@ -125,6 +126,7 @@ const translations = {
     confirmDelete: "Sind Sie sicher, dass Sie diese Sitzung löschen möchten?",
     confirmDeleteEmployee: "Sind Sie sicher, dass Sie Mitarbeiter {name} löschen möchten? Alle Zeiterfassungsdaten gehen verloren.",
     invalidData: "Die eingegebenen Daten sind ungültig. Überprüfen Sie Format und Reihenfolge der Daten.",
+    unknownEmployee: "Unbekannter Mitarbeiter",
 
     // Status
     IN: "EIN",

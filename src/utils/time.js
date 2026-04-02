@@ -2,10 +2,10 @@ export function nowIso() {
   return new Date().toISOString();
 }
 
-export function formatDateTime(iso) {
+export function formatDateTime(iso, locale = "de-DE") {
   if (!iso) return "-";
   const date = new Date(iso);
-  return date.toLocaleString("ro-RO", {
+  return date.toLocaleString(locale, {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

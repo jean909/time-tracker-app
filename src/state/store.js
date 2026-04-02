@@ -144,7 +144,7 @@ export async function removeEmployee(state, employeeId) {
 
 export function getEmployeeName(state, employeeId) {
   const emp = state.employees.find((e) => e.id === employeeId);
-  return emp ? emp.name : "Necunoscut";
+  return emp ? emp.name : null;
 }
 
 export function addManualSession(state, employeeId, startTime, endTime) {

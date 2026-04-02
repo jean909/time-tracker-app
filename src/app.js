@@ -63,6 +63,7 @@ function rerender() {
       btn.classList.add('active');
     }
   });
+  const currentLocale = getCurrentLanguage() === "de" ? "de-DE" : "en-GB";
 
   if (viewState.route === "login") {
     renderLoginPage(root, {
@@ -110,9 +111,9 @@ function rerender() {
         onTapEmployee: async (employeeId) => {
           const result = await toggleEmployee(state, employeeId);
           saveState(state);
-          const name = getEmployeeName(state, employeeId);
+          const name = getEmployeeName(state, employeeId) || t("unknownEmployee");
           const action = result.type === "IN" ? t('enteredWork') : t('leftWork');
-          viewState.kioskMessage = `${name} ${action} (${formatDateTime(result.at)}).`;
+          viewState.kioskMessage = `${name} ${action} (${formatDateTime(result.at, currentLocale)}).`;
           rerender();
         },
       }
@@ -132,8 +133,8 @@ function rerender() {
       rows: buildAdminRows(state),
       events: state.events.map((event) => ({
         ...event,
-        employeeName: getEmployeeName(state, event.employeeId),
-        at: formatDateTime(event.at),
+        employeeName: getEmployeeName(state, event.employeeId) || t("unknownEmployee"),
+        at: formatDateTime(event.at, currentLocale),
       })),
       editingEmployee: viewState.editingEmployee,
       employeeSessions: viewState.editingEmployee ? getEmployeeSessions(state, viewState.editingEmployee.id) : null,
